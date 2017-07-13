@@ -1,0 +1,51 @@
+{
+  "type": "full-release",
+  "name": "iop-solr-ambari-mpack",
+  "version": "{VERSION}",
+  "description": "IOP SOLR Management Pack",
+  "prerequisites": {
+    "min_ambari_version": "2.5.0.0",
+    "max-ambari-version" : ""
+  },
+  "artifacts": [
+    {
+      "name": "iop-solr-service-definitions ",
+      "type": "service-definitions",
+      "source_dir": "common-services"
+    },
+    {
+      "name": "hdp-solr-addon-service-definitions",
+      "type": "stack-addon-service-definitions",
+      "source_dir": "hdp-addon-services",
+      "service_versions_map": [
+        {
+          "service_name" : "SOLR",
+          "service_version" : "6.3.0",
+          "applicable_stacks" : [
+            {
+              "stack_name" : "HDP",
+              "stack_version" : "2.6"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "iop-solr-addon-service-definitions",
+      "type": "stack-addon-service-definitions",
+      "source_dir": "biginsight-addon-services",
+      "service_versions_map": [
+        {
+          "service_name" : "SOLR",
+          "service_version" : "6.3.0",
+          "applicable_stacks" : [
+            {
+              "stack_name" : "BigInsight",
+              "stack_version" : "4.2.5"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
