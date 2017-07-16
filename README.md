@@ -16,7 +16,7 @@ ambari-server stop
 
 Install Solr mpack:
 ```bash
-ambari-server install-mpack --mpack=/my-path/iop-solr-service-mpack-1.0.0.tar.gz --verbose
+ambari-server install-mpack --mpack=/my-path/iop-solr-mpack-1.0.0.tar.gz --verbose
 ```
 
 Start Ambari Server
@@ -28,7 +28,7 @@ ambari-server start
 ```bash
 cd iop-solr-stack
 # rpm
-./gradlew clean rpm -PstackVersion=2.6.0.0 -Pversion=6.3.0
+./gradlew clean rpm -PstackVersion=2.6.0.0 # generated package name: iop-solr-6.3.0-2.6.0.0
 # deb
-./gradlew clean deb -PstackVersion=2.6.0.0 -Pversion=6.3.0
+./gradlew clean deb -PstackVersion=2.6.0.0 # generated package name: iop-solr_6.3.0-2.6.0.0
 ```

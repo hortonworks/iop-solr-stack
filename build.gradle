@@ -36,6 +36,7 @@ apply plugin: "nebula.ospackage"
 ext.src = 'src/main/resources/'
 ext.repostemplate = 'src/main/template/repos/repoinfo.xml'
 ext.reposinfo = 'hdp-addon-services/SOLR/6.3.0/repos/'
+ext.distPackageName="${packageName}"
 
 task wrapper(type: Wrapper) {
   gradleVersion = '3.2'
@@ -86,25 +87,31 @@ task untarSolr(type:Copy, dependsOn: [downloadSolr]){
 }
 
 task rpm(type: Rpm, dependsOn: [untarSolr]) {
-  packageName = "${packageName}"
-  version = "${version}"
+  packageName = "${distPackageName}"
+  version = "${solrVersion}"
   release = "${stackVersion}"
-  into "/usr/hdp/${stackVersion}"
+  into "${stackFolder}/${stackVersion}"
+  os = LINUX
+  user = 'root'
+  permissionGroup = 'root'
   from("${buildDir}/solr-${solrVersion}/") {
-    into "${packageName}"
+    into "${distPackageName}"
   }
-  directory("/var/log/${packageName}", 644)
-  directory("/var/run/${packageName}", 644)
+  directory("/var/log/${distPackageName}", 644)
+  directory("/var/run/${distPackageName}", 644)
 }
 
 task deb(type: Deb, dependsOn: [untarSolr]) {
-  packageName = "${packageName}"
-  release = "${version}"
+  packageName = "${distPackageName}"
+  version = "${solrVersion}"
   release = "${stackVersion}"
-  into "/usr/hdp/${stackVersion}"
+  os = LINUX
+  user = 'root'
+  permissionGroup = 'root'
+  into "${stackFolder}/${stackVersion}"
   from("${buildDir}/solr-${solrVersion}/") {
-    into "${packageName}"
+    into "${distPackageName}"
   }
-  directory("/var/log/${packageName}", 644)
-  directory("/var/run/${packageName}", 644)
+  directory("/var/log/${distPackageName}", 644)
+  directory("/var/run/${distPackageName}", 644)
 }
