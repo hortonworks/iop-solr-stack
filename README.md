@@ -23,3 +23,12 @@ Start Ambari Server
 ```bash
 ambari-server start
 ```
+
+## Build Solr 6.3.0 RPM/DEB package
+```bash
+cd iop-solr-stack
+# rpm
+./gradlew clean rpm -PstackVersion=2.6.0.0 -Pversion=6.3.0
+# deb
+./gradlew clean deb -PstackVersion=2.6.0.0 -Pversion=6.3.0
+```

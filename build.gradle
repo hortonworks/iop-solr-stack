@@ -16,13 +16,22 @@
  */
 buildscript {
   repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
     mavenCentral()
+    jcenter()
+  }
+  dependencies {
+    classpath "com.netflix.nebula:gradle-ospackage-plugin:4.4.0"
+    classpath 'de.undercouch:gradle-download-task:3.2.0'
   }
 }
 
 apply plugin: 'idea'
 apply plugin: 'distribution'
 apply plugin: 'java'
+apply plugin: "nebula.ospackage"
 
 ext.src = 'src/main/resources/'
 ext.repostemplate = 'src/main/template/repos/repoinfo.xml'
@@ -61,4 +70,41 @@ distTar {
 }
 
 task buildTar(dependsOn: [clean, distTar]) {
+}
+
+import de.undercouch.gradle.tasks.download.Download
+
+task downloadSolr(type: Download, dependsOn: buildTar) {
+  src "${solrTar}"
+  dest buildDir
+  overwrite true
+}
+
+task untarSolr(type:Copy, dependsOn: [downloadSolr]){
+  from tarTree(resources.gzip("${buildDir}/solr-${solrVersion}.tgz"))
+  into buildDir
+}
+
+task rpm(type: Rpm, dependsOn: [untarSolr]) {
+  packageName = "${packageName}"
+  version = "${version}"
+  release = "${stackVersion}"
+  into "/usr/hdp/${stackVersion}"
+  from("${buildDir}/solr-${solrVersion}/") {
+    into "${packageName}"
+  }
+  directory("/var/log/${packageName}", 644)
+  directory("/var/run/${packageName}", 644)
+}
+
+task deb(type: Deb, dependsOn: [untarSolr]) {
+  packageName = "${packageName}"
+  release = "${version}"
+  release = "${stackVersion}"
+  into "/usr/hdp/${stackVersion}"
+  from("${buildDir}/solr-${solrVersion}/") {
+    into "${packageName}"
+  }
+  directory("/var/log/${packageName}", 644)
+  directory("/var/run/${packageName}", 644)
 }

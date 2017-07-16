@@ -20,6 +20,8 @@
   <services>
     <service>
       <name>SOLR</name>
+      <displayName>Solr</displayName>
+      <comment>Solr is the popular, blazing fast open source enterprise search platform from the Apache Lucene project</comment>
       <version>6.3.0</version>
       <extends>common-services/SOLR/6.3.0</extends>
       <osSpecifics>
