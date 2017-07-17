@@ -31,7 +31,7 @@ cd iop-solr-stack
 # note: generated rpm file: build/distributions/iop-solr-6.3.0.2.6.0.0-15.noarch.rpm, package name: iop-solr
 ./gradlew clean rpm -PstackVersion=2.6.0.0 -PstackBuildNumber=15
 # deb build:
-# note: generated rpm file: build/distributions/iop-solr_6.3.0-2.6.0.0-15_all.deb, package name: iop-solr
+# note: generated deb file: build/distributions/iop-solr_6.3.0-2.6.0.0-15_all.deb, package name: iop-solr
 ./gradlew clean deb -PstackVersion=2.6.0.0 -PstackBuildNumber=15
 
 # Example of install:
