@@ -34,6 +34,7 @@ apply plugin: 'java'
 apply plugin: "nebula.ospackage"
 
 ext.src = 'src/main/resources/'
+ext.distDir = "${projectDir}/dist"
 ext.repostemplate = 'src/main/template/repos/repoinfo.xml'
 ext.reposinfo = 'hdp-addon-services/SOLR/6.3.0/repos/'
 ext.distPackageName="${packageName}"
@@ -103,6 +104,11 @@ task untarSolr(type:Copy, dependsOn: [downloadSolr]){
   into buildDir
 }
 
+task processRangerConfigSet(type: Copy, dependsOn: [untarSolr]) {
+  from "${distDir}/ranger_audit_configs"
+  into "${buildDir}/solr-${solrVersion}/server/solr/configsets/ranger_audit_configs"
+}
+
 ospackage {
   packageName = "${distPackageName}"
   version = "${solrVersion}.${stackVersion}"
@@ -119,13 +125,13 @@ ospackage {
   }
 }
 
-task rpm(type: Rpm, dependsOn: [untarSolr]) {
+task rpm(type: Rpm, dependsOn: [untarSolr, processRangerConfigSet]) {
   packageDescription = "${solrDescription}"
   directory("/var/log/${distPackageName}", 644)
   directory("/var/run/${distPackageName}", 644)
 }
 
-task deb(type: Deb, dependsOn: [untarSolr]) {
+task deb(type: Deb, dependsOn: [untarSolr, processRangerConfigSet]) {
   packageDescription = "${solrDescription}".replaceAll("\n", "\n:")
   directory("/var/log/${distPackageName}", 644)
   directory("/var/run/${distPackageName}", 644)

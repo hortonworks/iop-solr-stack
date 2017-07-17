@@ -55,7 +55,7 @@ stack_version = default("/commandParams/version", None)
 sudo = AMBARI_SUDO_BINARY
 security_enabled = status_params.security_enabled
 fs_root = config['configurations']['core-site']['fs.defaultFS']
-solr_conf = "/etc/solr/conf"
+solr_conf = "/etc/iop-solr/conf"
 
 solr_port = status_params.solr_port
 solr_piddir = status_params.solr_piddir
@@ -77,8 +77,8 @@ zookeeper_hosts = ",".join(zookeeper_hosts_list)
 
 # Only supporting SolrCloud mode - so hardcode those options
 solr_cloudmode = 'true'
-solr_dir = '/usr/iop/current/solr-server'
-solr_client_dir = '/usr/iop/current/solr-client'
+solr_dir = '/usr/hdp/current/iop-solr'
+solr_client_dir = '/usr/hdp/current/solr-client'
 solr_bindir = solr_dir + '/bin'
 cloud_scripts = solr_dir + '/server/scripts/cloud-scripts'
 
@@ -274,7 +274,7 @@ if has_ranger_admin and is_supported_solr_ranger:
   ssl_truststore_password = unicode(config['configurations']['ranger-solr-policymgr-ssl']['xasecure.policymgr.clientssl.truststore.password']) if xml_configurations_supported else None
   credential_file = format('/etc/ranger/{repo_name}/cred.jceks') if xml_configurations_supported else None
 
-  stack_version = get_stack_version('solr-server')
+  stack_version = get_stack_version('iop-solr')
   setup_ranger_env_sh_source = format('{stack_root}/{stack_version}/ranger-solr-plugin/install/conf.templates/enable/solr-ranger-env.sh')
   setup_ranger_env_sh_target = format("{solr_conf}/solr-ranger-env.sh")
 
