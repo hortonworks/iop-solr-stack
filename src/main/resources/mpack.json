@@ -29,23 +29,6 @@
           ]
         }
       ]
-    },
-    {
-      "name": "iop-solr-addon-service-definitions",
-      "type": "stack-addon-service-definitions",
-      "source_dir": "biginsight-addon-services",
-      "service_versions_map": [
-        {
-          "service_name" : "SOLR",
-          "service_version" : "6.3.0",
-          "applicable_stacks" : [
-            {
-              "stack_name" : "BigInsight",
-              "stack_version" : "4.2.5"
-            }
-          ]
-        }
-      ]
     }
   ]
 }
