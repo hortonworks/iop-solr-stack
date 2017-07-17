@@ -27,8 +27,14 @@ ambari-server start
 ## Build Solr 6.3.0 RPM/DEB package
 ```bash
 cd iop-solr-stack
-# rpm
-./gradlew clean rpm -PstackVersion=2.6.0.0 # generated package name: iop-solr-6.3.0-2.6.0.0
-# deb
-./gradlew clean deb -PstackVersion=2.6.0.0 # generated package name: iop-solr_6.3.0-2.6.0.0
+# rpm build:
+# note: generated rpm file: build/distributions/iop-solr-6.3.0.2.6.0.0-15.noarch.rpm, package name: iop-solr
+./gradlew clean rpm -PstackVersion=2.6.0.0 -PstackBuildNumber=15
+# deb build:
+# note: generated rpm file: build/distributions/iop-solr_6.3.0-2.6.0.0-15_all.deb, package name: iop-solr
+./gradlew clean deb -PstackVersion=2.6.0.0 -PstackBuildNumber=15
+
+# Example of install:
+# note: files will be extracted to /usr/hdp/2.6.0.0-15/iop-solr folder
+yum install -y iop-solr-6.3.0.2.6.0.0-15.noarch.rpm
 ```

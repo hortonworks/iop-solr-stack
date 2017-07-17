@@ -37,6 +37,23 @@ ext.src = 'src/main/resources/'
 ext.repostemplate = 'src/main/template/repos/repoinfo.xml'
 ext.reposinfo = 'hdp-addon-services/SOLR/6.3.0/repos/'
 ext.distPackageName="${packageName}"
+ext.solrDescription = '''\
+Solr is the popular, blazing fast open source enterprise search platform from
+the Apache Lucene project. Its major features include powerful full-text
+search, hit highlighting, faceted search, dynamic clustering, database
+integration, rich document (e.g., Word, PDF) handling, and geospatial search.
+Solr is highly scalable, providing distributed search and index replication,
+and it powers the search and navigation features of many of the world's
+largest internet sites.
+
+Solr is written in Java and runs as a standalone full-text search server within
+a servlet container such as Tomcat. Solr uses the Lucene Java search library at
+its core for full-text indexing and search, and has REST-like HTTP/XML and JSON
+APIs that make it easy to use from virtually any programming language. Solr's
+powerful external configuration allows it to be tailored to almost any type of
+application without Java coding, and it has an extensive plugin architecture
+when more advanced customization is required.
+'''
 
 task wrapper(type: Wrapper) {
   gradleVersion = '3.2'
@@ -86,32 +103,30 @@ task untarSolr(type:Copy, dependsOn: [downloadSolr]){
   into buildDir
 }
 
-task rpm(type: Rpm, dependsOn: [untarSolr]) {
+ospackage {
   packageName = "${distPackageName}"
-  version = "${solrVersion}"
-  release = "${stackVersion}"
-  into "${stackFolder}/${stackVersion}"
+  version = "${solrVersion}.${stackVersion}"
+  release = "${stackBuildNumber}"
+  into "${stackFolder}/${stackVersion}-${stackBuildNumber}"
   os = LINUX
   user = 'root'
   permissionGroup = 'root'
+  license = "APL2"
+  url = "http://lucene.apache.org/solr"
+  summary = "Apache Solr is the popular, blazing fast open source enterprise search platform"
   from("${buildDir}/solr-${solrVersion}/") {
     into "${distPackageName}"
   }
+}
+
+task rpm(type: Rpm, dependsOn: [untarSolr]) {
+  packageDescription = "${solrDescription}"
   directory("/var/log/${distPackageName}", 644)
   directory("/var/run/${distPackageName}", 644)
 }
 
 task deb(type: Deb, dependsOn: [untarSolr]) {
-  packageName = "${distPackageName}"
-  version = "${solrVersion}"
-  release = "${stackVersion}"
-  os = LINUX
-  user = 'root'
-  permissionGroup = 'root'
-  into "${stackFolder}/${stackVersion}"
-  from("${buildDir}/solr-${solrVersion}/") {
-    into "${distPackageName}"
-  }
+  packageDescription = "${solrDescription}".replaceAll("\n", "\n:")
   directory("/var/log/${distPackageName}", 644)
   directory("/var/run/${distPackageName}", 644)
 }
