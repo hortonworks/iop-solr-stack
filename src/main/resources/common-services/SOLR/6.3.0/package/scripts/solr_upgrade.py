@@ -24,48 +24,6 @@ from resource_management.libraries.functions import conf_select
 from resource_management.libraries.functions import get_unique_id_and_date
 
 class SolrServerUpgrade(Script):
-  def pre_upgrade_conf41(self, env):
-    """
-    Create /etc/solr/4.1.0.0/0 directory and copies Solr config files here.
-    Create symlinks accordingly.
-
-    conf-select create-conf-dir --package solr --stack-version 4.1.0.0 --conf-version 0
-    cp -r /usr/iop/4.1.0.0/solr/conf/* /etc/solr/4.1.0.0/0/.
-    unlink or rm -r /usr/iop/4.1.0.0/solr/conf
-    ln -s /etc/solr/4.1.0.0/0 /usr/iop/4.1.0.0/solr/conf
-    conf-select set-conf-dir --package solr --stack-version 4.1.0.0 --conf-version 0
-    """
-    import params
-    env.set_params(params)
-
-    solr41_conf_dir="/usr/iop/4.1.0.0/solr/conf"
-    solr41_etc_dir="/etc/solr/4.1.0.0/0"
-    if not os.path.exists(solr41_etc_dir):
-      conf_select.create(params.stack_name, "solr", "4.1.0.0")
-
-    content_path=solr41_conf_dir
-    if not os.path.isfile("/usr/iop/4.1.0.0/solr/conf/solr.in.sh"):
-      content_path = "/etc/solr/conf.backup"
-
-    for each in os.listdir(content_path):
-      File(os.path.join(solr41_etc_dir, each),
-           owner=params.solr_user,
-           content = StaticFile(os.path.join(content_path, each)))
-
-    if not os.path.islink(solr41_conf_dir):
-      Directory(solr41_conf_dir,
-                action="delete",
-                create_parents = True)
-
-    if os.path.islink(solr41_conf_dir):
-      os.unlink(solr41_conf_dir)
-
-    if not os.path.islink(solr41_conf_dir):
-      Link(solr41_conf_dir,
-           to=solr41_etc_dir
-      )
-
-    conf_select.select(params.stack_name, "solr", "4.1.0.0")
 
   def pre_stop_backup_cores(self, env):
     """

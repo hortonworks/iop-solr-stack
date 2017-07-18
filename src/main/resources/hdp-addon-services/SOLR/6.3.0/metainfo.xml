@@ -33,6 +33,7 @@
             </package>
             <package>
               <name>ambari-infra-solr-client-*</name>
+              <name>ranger-solr-plugin</name>
             </package>
           </packages>
         </osSpecific>
@@ -44,6 +45,7 @@
             </package>
             <package>
               <name>ambari-infra-solr-client-*</name>
+              <name>ranger-solr-plugin</name>
             </package>
           </packages>
         </osSpecific>

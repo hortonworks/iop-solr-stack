@@ -65,12 +65,12 @@ def setup_ranger_solr():
         plugin_dir = os.path.join(params.stack_root, params.stack_version, "ranger-solr-plugin/lib", jar_file)
 
         Execute(('ln','-sf', plugin_dir,
-            os.path.join(params.stack_root, params.stack_version, "solr/server/solr-webapp/webapp/WEB-INF/lib", jar_file)),
+            os.path.join(params.stack_root, params.stack_version, "iop-solr/server/solr-webapp/webapp/WEB-INF/lib", jar_file)),
             only_if=format('ls {plugin_dir}'),
             sudo=True)
 
 
-    setup_ranger_plugin('solr-server', 'solr', params.previous_jdbc_jar,
+    setup_ranger_plugin('iop-solr', 'iop-solr', params.previous_jdbc_jar,
                         params.downloaded_custom_connector, params.driver_curl_source,
                         params.driver_curl_target, params.java64_home,
                         params.repo_name, params.solr_ranger_plugin_repo,
@@ -90,10 +90,10 @@ def setup_ranger_solr():
                         component_user_principal=params.solr_kerberos_principal if params.security_enabled else None,
                         component_user_keytab=params.solr_kerberos_keytab if params.security_enabled else None)
 
-    properties_files = os.listdir(format('/etc/solr/conf'))
+    properties_files = os.listdir(format('/etc/iop-solr/conf'))
 
     if params.security_enabled and params.enable_ranger_solr:
-      solr_classes_dir =  os.path.join(params.stack_root, params.stack_version, "solr/server/solr-webapp/webapp/WEB-INF/classes")
+      solr_classes_dir =  os.path.join(params.stack_root, params.stack_version, "iop-solr/server/solr-webapp/webapp/WEB-INF/classes")
       Directory(solr_classes_dir,
                     owner=params.solr_user,
                     group=params.user_group,
@@ -105,16 +105,16 @@ def setup_ranger_solr():
               not_if=format('ls {solr_classes_dir}'))
 
       for properties_file in properties_files:
-        Execute(('ln','-sf',format('/etc/solr/conf/{properties_file}'),
-              os.path.join(params.stack_root, params.stack_version, "solr/server/solr-webapp/webapp/WEB-INF/classes", properties_file)),
-              only_if=format('ls /etc/solr/conf/{properties_file}'),
+        Execute(('ln','-sf',format('/etc/iop-solr/conf/{properties_file}'),
+              os.path.join(params.stack_root, params.stack_version, "iop-solr/server/solr-webapp/webapp/WEB-INF/classes", properties_file)),
+              only_if=format('ls /etc/iop-solr/conf/{properties_file}'),
               sudo=True)
 
     zk_port = ":" + params.zookeeper_port + ","
 
     if params.enable_ranger_solr:
       zookeeper_hosts_ip = zk_port.join(params.zookeeper_hosts_list) + ":" + params.zookeeper_port
-      zookeeper_script = os.path.join(params.stack_root, params.stack_version, "solr/server/scripts/cloud-scripts/zkcli.sh")
+      zookeeper_script = os.path.join(params.stack_root, params.stack_version, "iop-solr/server/scripts/cloud-scripts/zkcli.sh")
 
       set_solr_ranger_authorizer = format('{zookeeper_script} -zkhost {zookeeper_hosts_ip} ' +
                       '-cmd put /solr/security.json \'{{\"authentication":{{\"class\":\"org.apache.solr.security.KerberosPlugin\"}},\"authorization\":{{\"class\": '+

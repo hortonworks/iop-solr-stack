@@ -35,8 +35,6 @@ apply plugin: "nebula.ospackage"
 
 ext.src = 'src/main/resources/'
 ext.distDir = "${projectDir}/dist"
-ext.repostemplate = 'src/main/template/repos/repoinfo.xml'
-ext.reposinfo = 'hdp-addon-services/SOLR/6.3.0/repos/'
 ext.distPackageName="${packageName}"
 ext.solrDescription = '''\
 Solr is the popular, blazing fast open source enterprise search platform from
@@ -69,13 +67,6 @@ distributions {
       from { src + 'mpack.json' }
       filter { String line ->
         line.replace("{VERSION}", "${version}")
-      }
-
-      into(reposinfo) {
-        from { repostemplate }
-        filter { String line ->
-          line.replace("{REPOID}", "${repoid}")
-        }
       }
     }
   }
