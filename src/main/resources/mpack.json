@@ -9,11 +9,6 @@
   },
   "artifacts": [
     {
-      "name": "iop-solr-service-definitions ",
-      "type": "service-definitions",
-      "source_dir": "common-services"
-    },
-    {
       "name": "hdp-solr-addon-service-definitions",
       "type": "stack-addon-service-definitions",
       "source_dir": "hdp-addon-services",

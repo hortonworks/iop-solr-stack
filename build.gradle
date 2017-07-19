@@ -33,6 +33,16 @@ apply plugin: 'distribution'
 apply plugin: 'java'
 apply plugin: "nebula.ospackage"
 
+dependencies {
+  compile group: 'com.vividsolutions', name: 'jts', version: '1.13'
+  compile group: 'org.apache.hadoop', name: 'hadoop-nfs', version: '2.7.2'
+}
+
+repositories {
+  mavenCentral()
+  jcenter()
+}
+
 ext.src = 'src/main/resources/'
 ext.distDir = "${projectDir}/dist"
 ext.distPackageName="${packageName}"
@@ -95,7 +105,19 @@ task untarSolr(type:Copy, dependsOn: [downloadSolr]){
   into buildDir
 }
 
-task processRangerConfigSet(type: Copy, dependsOn: [untarSolr]) {
+def findJar(prefix) {
+  configurations.compile.filter { it.name.startsWith(prefix) }
+}
+
+task copyLibs(type: Copy, dependsOn: [untarSolr]) {
+  into ("server/solr-webapp/webapp/WEB-INF/lib/") {
+    from findJar('hadoop-nfs')
+    from findJar('jts')
+  }
+  into "${buildDir}/solr-${solrVersion}"
+}
+
+task processRangerConfigSet(type: Copy, dependsOn: [untarSolr, copyLibs]) {
   from "${distDir}/ranger_audit_configs"
   into "${buildDir}/solr-${solrVersion}/server/solr/configsets/ranger_audit_configs"
 }
