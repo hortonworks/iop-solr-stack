@@ -114,6 +114,7 @@ ospackage {
   from("${buildDir}/solr-${solrVersion}/") {
     into "${distPackageName}"
   }
+  link("${stackFolder}/current/${distPackageName}", "${stackFolder}/${stackVersion}-${stackBuildNumber}/${distPackageName}", 777)
 }
 
 task rpm(type: Rpm, dependsOn: [untarSolr, processRangerConfigSet]) {
