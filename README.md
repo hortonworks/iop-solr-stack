@@ -4,7 +4,7 @@
 Download iop-solr-stack repository from git then run:
 ```bash
 cd iop-solr-stack
-./gradlew clean buildTar -Pversion=1.0.0 # addition options: -PpackageName=... and -Prepoid=...
+./gradlew clean buildTar -Pversion=1.0.0 # addition option: -PpackageName=...
 ```
 
 ## Install IOP Solr mpack
