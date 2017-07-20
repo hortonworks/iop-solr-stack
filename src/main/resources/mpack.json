@@ -9,6 +9,11 @@
   },
   "artifacts": [
     {
+      "name" : "hdp-solr-extension-definitions",
+      "type" : "extension-definitions",
+      "source_dir": "extensions"
+    },
+    {
       "name": "hdp-solr-addon-service-definitions",
       "type": "stack-addon-service-definitions",
       "source_dir": "hdp-addon-services",
