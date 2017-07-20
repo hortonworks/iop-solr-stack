@@ -69,8 +69,7 @@ def setup_ranger_solr():
             only_if=format('ls {plugin_dir}'),
             sudo=True)
 
-
-    setup_ranger_plugin('hadoop-hdfs-datanode', 'iop-solr', params.previous_jdbc_jar,
+    setup_ranger_plugin('hadoop-hdfs-datanode', 'solr', params.previous_jdbc_jar,
                         params.downloaded_custom_connector, params.driver_curl_source,
                         params.driver_curl_target, params.java64_home,
                         params.repo_name, params.solr_ranger_plugin_repo,
