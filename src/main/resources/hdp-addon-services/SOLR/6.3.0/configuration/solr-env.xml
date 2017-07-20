@@ -37,7 +37,7 @@
   </property>
   <property>
     <name>solr_pid_dir</name>
-    <value>/var/run/solr</value>
+    <value>/var/run/iop-solr</value>
     <description>Solr Process ID Directory</description>
     <display-name>Solr pid dir</display-name>
     <value-attributes>
@@ -47,7 +47,7 @@
   </property>
   <property>
     <name>solr_log_dir</name>
-    <value>/var/log/solr</value>
+    <value>/var/log/iop-solr</value>
     <description>Directory for Solr logs</description>
     <display-name>Solr log dir</display-name>
     <value-attributes>
