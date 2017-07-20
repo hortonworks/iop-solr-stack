@@ -61,8 +61,8 @@
   </property>
   <property>
     <name>xasecure.audit.destination.hdfs.batch.filespool.dir</name>
-    <value>/var/log/solr/audit/hdfs/spool</value>
-    <description>/var/log/solr/audit/hdfs/spool</description>
+    <value>/var/log/iop-solr/audit/hdfs/spool</value>
+    <description>/var/iop-solr/solr/audit/hdfs/spool</description>
     <on-ambari-upgrade add="false"/>
   </property>
   <property>
@@ -110,8 +110,8 @@
   </property>
   <property>
     <name>xasecure.audit.destination.solr.batch.filespool.dir</name>
-    <value>/var/log/solr/audit/solr/spool</value>
-    <description>/var/log/solr/audit/solr/spool</description>
+    <value>/var/log/iop-solr/audit/solr/spool</value>
+    <description>/var/log/iop-solr/audit/solr/spool</description>
     <on-ambari-upgrade add="false"/>
   </property>
   <property>
