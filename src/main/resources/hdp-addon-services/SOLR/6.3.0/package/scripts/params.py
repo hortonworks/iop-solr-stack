@@ -274,7 +274,7 @@ if has_ranger_admin and is_supported_solr_ranger:
   ssl_truststore_password = unicode(config['configurations']['ranger-solr-policymgr-ssl']['xasecure.policymgr.clientssl.truststore.password']) if xml_configurations_supported else None
   credential_file = format('/etc/ranger/{repo_name}/cred.jceks') if xml_configurations_supported else None
 
-  stack_version = get_stack_version('iop-solr')
+  stack_version = get_stack_version('hadoop-hdfs-datanode') # use hadoop-hdfs-datanode as its required for solr
   setup_ranger_env_sh_source = format('{stack_root}/{stack_version}/ranger-solr-plugin/install/conf.templates/enable/solr-ranger-env.sh')
   setup_ranger_env_sh_target = format("{solr_conf}/solr-ranger-env.sh")
 
