@@ -115,7 +115,7 @@ def setup_ranger_solr():
       zookeeper_hosts_ip = zk_port.join(params.zookeeper_hosts_list) + ":" + params.zookeeper_port
       zookeeper_script = os.path.join(params.stack_root, params.stack_version, "iop-solr/server/scripts/cloud-scripts/zkcli.sh")
 
-      set_solr_ranger_authorizer = format('{zookeeper_script} -zkhost {zookeeper_hosts_ip} ' +
+      set_solr_ranger_authorizer = format('JAVA_HOME={java64_home} {zookeeper_script} -zkhost {zookeeper_hosts_ip} ' +
                       '-cmd put /solr/security.json \'{{\"authentication":{{\"class\":\"org.apache.solr.security.KerberosPlugin\"}},\"authorization\":{{\"class\": '+
                       '\"org.apache.ranger.authorization.solr.authorizer.RangerSolrAuthorizer\"}}}}\'')
 
