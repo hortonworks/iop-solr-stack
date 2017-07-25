@@ -74,7 +74,9 @@
               <name>iop-solr</name>
             </package>
             <package>
-              <name>ambari-infra-solr-client-*</name>
+              <name>ambari-infra-solr-client</name>
+            </package>
+            <package>
               <name>ranger-solr-plugin</name>
             </package>
           </packages>
@@ -86,7 +88,9 @@
               <name>iop-solr</name>
             </package>
             <package>
-              <name>ambari-infra-solr-client-*</name>
+              <name>ambari-infra-solr-client</name>
+            </package>
+            <package>
               <name>ranger-solr-plugin</name>
             </package>
           </packages>
