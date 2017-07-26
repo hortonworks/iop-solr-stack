@@ -77,7 +77,7 @@ zookeeper_hosts = ",".join(zookeeper_hosts_list)
 
 # Only supporting SolrCloud mode - so hardcode those options
 solr_cloudmode = 'true'
-solr_dir = '/usr/hdp/current/iop-solr'
+solr_dir = '/usr/iopsolr/current/iop-solr'
 solr_client_dir = '/usr/hdp/current/solr-client'
 solr_bindir = solr_dir + '/bin'
 cloud_scripts = solr_dir + '/server/scripts/cloud-scripts'
