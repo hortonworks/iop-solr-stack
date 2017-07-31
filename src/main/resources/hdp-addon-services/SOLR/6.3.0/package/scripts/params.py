@@ -47,7 +47,7 @@ stack_root = Script.get_stack_root()
 stack_name = default("/hostLevelParams/stack_name", None)
 retryAble = default("/commandParams/command_retry_enabled", False)
 version = default("/commandParams/version", None)
-
+cluster_name = config["clusterName"]
 
 current_version = default("/hostLevelParams/current_version", None)
 upgrade_direction = default("/commandParams/upgrade_direction", None)

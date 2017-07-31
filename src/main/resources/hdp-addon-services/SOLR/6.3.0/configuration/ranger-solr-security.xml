@@ -39,7 +39,7 @@
   </property>
   <property>
     <name>ranger.plugin.solr.policy.rest.ssl.config.file</name>
-    <value>/etc/solr/conf/ranger-policymgr-ssl.xml</value>
+    <value>/etc/iop-solr/conf/ranger-policymgr-ssl.xml</value>
     <description>Path to the file containing SSL details to contact Ranger Admin</description>
     <on-ambari-upgrade add="false"/>
   </property>
