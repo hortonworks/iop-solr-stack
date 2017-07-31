@@ -19,14 +19,14 @@
     <repo>
       <baseurl>{CENTOS6_URL}</baseurl>
       <repoid>{REPOID}</repoid>
-      <reponame>{REPONAME}</reponame>
+      <reponame>IOPSOLR</reponame>
     </repo>
   </os>
   <os family="redhat7">
     <repo>
       <baseurl>{CENTOS7_URL}</baseurl>
       <repoid>{REPOID}</repoid>
-      <reponame>{REPONAME}</reponame>
+      <reponame>IOPSOLR</reponame>
     </repo>
   </os>
 </reposinfo>

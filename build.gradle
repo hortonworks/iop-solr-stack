@@ -96,7 +96,6 @@ distributions {
         filter { String line ->
           line
             .replace("{REPOID}", "${repoid}")
-            .replace("{REPONAME}", "${reponame}")
             .replace("{CENTOS6_URL}", "${x_repoCentos6BaseUrl}")
             .replace("{CENTOS7_URL}", "${x_repoCentos7BaseUrl}");
         }

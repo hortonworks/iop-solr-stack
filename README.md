@@ -38,3 +38,13 @@ cd iop-solr-stack
 # note: files will be extracted to /usr/hdp/2.6.0.0-15/iop-solr folder
 yum install -y iop-solr-6.3.0.2.6.0.0-15.noarch.rpm
 ```
+
+## Notes about properties
+```bash
+-Pversion=.. # mpack version
+-PsolrVersion=.. # solr version
+-PsolrTar=.. # solr tar.gz location (can be local with file:// prefix)
+-PrepoCentos6BaseUrl=.. -PrepoCentos7BaseUrl=.. # repo url for solr rpm, it will be used in repoinfo.xml file
+-Prepoid=.. # that is placed to repoinfo.xml as a repoid
+-PstackFolder=.. # package will be unpackaged into that location
+```
