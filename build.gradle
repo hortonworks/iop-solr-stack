@@ -44,6 +44,8 @@ repositories {
 }
 
 ext.src = 'src/main/resources/'
+ext.repostemplate = 'src/main/template/repos/repoinfo.xml'
+ext.reposinfo = 'hdp-addon-services/SOLR/6.3.0/repos/'
 ext.distDir = "${projectDir}/dist"
 ext.distPackageName="${packageName}"
 ext.solrDescription = '''\
@@ -63,6 +65,16 @@ powerful external configuration allows it to be tailored to almost any type of
 application without Java coding, and it has an extensive plugin architecture
 when more advanced customization is required.
 '''
+// extend plain properties with property references
+ext.x_solrTar="${solrTar}".replace('${solrVersion}', "${solrVersion}")
+ext.x_repoCentos6BaseUrl="${repoCentos6BaseUrl}"
+  .replace('${repoid}', "${repoid}")
+  .replace('${stackVersion}', "${stackVersion}")
+  .replace('${stackBuildNumber}', "${stackBuildNumber}")
+ext.x_repoCentos7BaseUrl="${repoCentos7BaseUrl}"
+  .replace('${repoid}', "${repoid}")
+  .replace('${stackVersion}', "${stackVersion}")
+  .replace('${stackBuildNumber}', "${stackBuildNumber}")
 
 task wrapper(type: Wrapper) {
   gradleVersion = '3.2'
@@ -78,6 +90,18 @@ distributions {
       filter { String line ->
         line.replace("{VERSION}", "${version}")
       }
+
+      into(reposinfo) {
+        from { repostemplate }
+        filter { String line ->
+          line
+            .replace("{REPOID}", "${repoid}")
+            .replace("{REPONAME}", "${reponame}")
+            .replace("{CENTOS6_URL}", "${x_repoCentos6BaseUrl}")
+            .replace("{CENTOS7_URL}", "${x_repoCentos7BaseUrl}");
+        }
+      }
+
     }
   }
 }
@@ -95,7 +119,7 @@ task buildTar(dependsOn: [clean, distTar]) {
 import de.undercouch.gradle.tasks.download.Download
 
 task downloadSolr(type: Download, dependsOn: buildTar) {
-  src "${solrTar}"
+  src "${x_solrTar}"
   dest buildDir
   overwrite true
 }
