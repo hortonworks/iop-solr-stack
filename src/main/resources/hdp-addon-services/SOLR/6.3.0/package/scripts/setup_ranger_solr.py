@@ -64,10 +64,10 @@ def setup_ranger_solr():
     for jar_file in jar_files:
         plugin_dir = os.path.join(params.stack_root, params.stack_version, "ranger-solr-plugin/lib", jar_file)
 
-        Execute(('ln','-sf', plugin_dir,
-            os.path.join(params.stack_root, params.stack_version, "iop-solr/server/solr-webapp/webapp/WEB-INF/lib", jar_file)),
+        Execute(('ln','-sf', plugin_dir, format("{solr_dir}/server/solr-webapp/webapp/WEB-INF/lib/{jar_file}")),
             only_if=format('ls {plugin_dir}'),
-            sudo=True)
+            sudo=True
+          )
 
     setup_ranger_plugin('hadoop-hdfs-datanode', 'solr', params.previous_jdbc_jar,
                         params.downloaded_custom_connector, params.driver_curl_source,
@@ -92,7 +92,7 @@ def setup_ranger_solr():
     properties_files = os.listdir(format('/etc/iop-solr/conf'))
 
     if params.security_enabled and params.enable_ranger_solr:
-      solr_classes_dir =  os.path.join(params.stack_root, params.stack_version, "iop-solr/server/solr-webapp/webapp/WEB-INF/classes")
+      solr_classes_dir = format("{solr_dir}/server/solr-webapp/webapp/WEB-INF/classes")
       Directory(solr_classes_dir,
                     owner=params.solr_user,
                     group=params.user_group,
@@ -105,7 +105,7 @@ def setup_ranger_solr():
 
       for properties_file in properties_files:
         Execute(('ln','-sf',format('/etc/iop-solr/conf/{properties_file}'),
-              os.path.join(params.stack_root, params.stack_version, "iop-solr/server/solr-webapp/webapp/WEB-INF/classes", properties_file)),
+              format("{solr_dir}/server/solr-webapp/webapp/WEB-INF/classes/{properties_file}")),
               only_if=format('ls /etc/iop-solr/conf/{properties_file}'),
               sudo=True)
 
@@ -113,10 +113,10 @@ def setup_ranger_solr():
 
     if params.enable_ranger_solr:
       zookeeper_hosts_ip = zk_port.join(params.zookeeper_hosts_list) + ":" + params.zookeeper_port
-      zookeeper_script = os.path.join(params.stack_root, params.stack_version, "iop-solr/server/scripts/cloud-scripts/zkcli.sh")
+      zookeeper_script = format("{solr_dir}/server/scripts/cloud-scripts/zkcli.sh")
 
       set_solr_ranger_authorizer = format('JAVA_HOME={java64_home} {zookeeper_script} -zkhost {zookeeper_hosts_ip} ' +
-                      '-cmd put /solr/security.json \'{{\"authentication":{{\"class\":\"org.apache.solr.security.KerberosPlugin\"}},\"authorization\":{{\"class\": '+
+                      '-cmd put {solr_znode}/security.json \'{{\"authentication":{{\"class\":\"org.apache.solr.security.KerberosPlugin\"}},\"authorization\":{{\"class\": '+
                       '\"org.apache.ranger.authorization.solr.authorizer.RangerSolrAuthorizer\"}}}}\'')
 
       Execute(set_solr_ranger_authorizer)
