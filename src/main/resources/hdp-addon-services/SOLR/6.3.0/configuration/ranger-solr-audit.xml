@@ -26,12 +26,6 @@
     <on-ambari-upgrade add="false"/>
   </property>
   <property>
-    <name>xasecure.audit.credential.provider.file</name>
-    <value>jceks://file{{credential_file}}</value>
-    <description>Credential file store</description>
-    <on-ambari-upgrade add="false"/>
-  </property>
-  <property>
     <name>xasecure.audit.destination.hdfs</name>
     <value>true</value>
     <display-name>Audit to HDFS</display-name>
