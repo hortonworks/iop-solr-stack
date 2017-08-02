@@ -30,13 +30,7 @@ buildscript {
 
 apply plugin: 'idea'
 apply plugin: 'distribution'
-apply plugin: 'java'
 apply plugin: "nebula.ospackage"
-
-dependencies {
-  compile group: 'com.vividsolutions', name: 'jts', version: '1.13'
-  compile group: 'org.apache.hadoop', name: 'hadoop-nfs', version: '2.7.2'
-}
 
 repositories {
   mavenCentral()
@@ -128,23 +122,6 @@ task untarSolr(type:Copy, dependsOn: [downloadSolr]){
   into buildDir
 }
 
-def findJar(prefix) {
-  configurations.compile.filter { it.name.startsWith(prefix) }
-}
-
-task copyLibs(type: Copy, dependsOn: [untarSolr]) {
-  into ("server/solr-webapp/webapp/WEB-INF/lib/") {
-    from findJar('hadoop-nfs')
-    from findJar('jts')
-  }
-  into "${buildDir}/solr-${solrVersion}"
-}
-
-task processRangerConfigSet(type: Copy, dependsOn: [untarSolr, copyLibs]) {
-  from "${distDir}/ranger_audit_configs"
-  into "${buildDir}/solr-${solrVersion}/server/solr/configsets/ranger_audit_configs"
-}
-
 ospackage {
   packageName = "${distPackageName}"
   version = "${solrVersion}.${stackVersion}"
@@ -162,13 +139,13 @@ ospackage {
   link("${stackFolder}/current/${distPackageName}", "${stackFolder}/${stackVersion}-${stackBuildNumber}/${distPackageName}", 777)
 }
 
-task rpm(type: Rpm, dependsOn: [untarSolr, processRangerConfigSet]) {
+task rpm(type: Rpm, dependsOn: [untarSolr]) {
   packageDescription = "${solrDescription}"
   directory("/var/log/${distPackageName}", 644)
   directory("/var/run/${distPackageName}", 644)
 }
 
-task deb(type: Deb, dependsOn: [untarSolr, processRangerConfigSet]) {
+task deb(type: Deb, dependsOn: [untarSolr]) {
   packageDescription = "${solrDescription}".replaceAll("\n", "\n:")
   directory("/var/log/${distPackageName}", 644)
   directory("/var/run/${distPackageName}", 644)
