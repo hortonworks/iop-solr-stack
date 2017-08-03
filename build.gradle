@@ -122,9 +122,17 @@ task untarSolr(type:Copy, dependsOn: [downloadSolr]){
   into buildDir
 }
 
+def removeBuildNumber(releaseNumber) {
+  if (releaseNumber.contains("-")) {
+    String [] splitted = releaseNumber.split("-");
+    return splitted[0]
+  }
+  return releaseNumber
+}
+
 ospackage {
   packageName = "${distPackageName}"
-  version = "${solrVersion}.${stackVersion}"
+  version = removeBuildNumber("${solrVersion}") + ".${stackVersion}"
   release = "${stackBuildNumber}"
   into "${stackFolder}/${stackVersion}-${stackBuildNumber}"
   os = LINUX
