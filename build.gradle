@@ -38,6 +38,8 @@ repositories {
 }
 
 ext.src = 'src/main/resources/'
+ext.scripts = 'src/main/scripts/'
+ext.scripts_output = 'utilities/'
 ext.repostemplate = 'src/main/template/repos/repoinfo.xml'
 ext.reposinfo = 'hdp-addon-services/SOLR/6.3.0/repos/'
 ext.distDir = "${projectDir}/dist"
@@ -93,6 +95,10 @@ distributions {
             .replace("{CENTOS6_URL}", "${x_repoCentos6BaseUrl}")
             .replace("{CENTOS7_URL}", "${x_repoCentos7BaseUrl}");
         }
+      }
+
+      into(scripts_output) {
+        from { scripts }
       }
 
     }
