@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-
+import sys
 import urllib2
 import json
 import base64
@@ -195,34 +195,78 @@ def get_stack_default_properties(stack_default_properties_json):
 
   return stack_default_properties
 
-def backup(options, accessor):
+def check_cluster_option(options, parser):
+  if not options.cluster:
+    parser.print_help()
+    print 'cluster option is required'
+    sys.exit(1)
+
+def backup(options, accessor, parser):
   '''
-  Backup old configs and hosts
+  Backup old configs and hosts to a specific folder
   '''
+  if not options.backup_location:
+    parser.print_help()
+    print 'backup-location option is required'
+    sys.exit(1)
+
+  check_cluster_option(options, parser)
+
   process_to_file(options, accessor, CLUSTERS_URL.format(options.cluster) + BACKUP_CONFIGS_URL.format(SOLR_SERVICE_NAME), CONFIG_BACKUP_FILE)
   process_to_file(options, accessor, CLUSTERS_URL.format(options.cluster) + BACKUP_HOSTS_URL.format(SOLR_SERVICE_NAME, SOLR_COMPONENT_NAME), HOST_BACKUP_FILE)
 
-def start_solr_service(options, accessor):
-  # TODO check params
+def start_solr_service(options, accessor, parser):
+  '''
+    Start Solr service
+    '''
+  check_cluster_option(options, parser)
+
   start_solr_body = '{"RequestInfo": {"context" :"Start IOP Solr"}, "Body": {"ServiceInfo": {"state": "STARTED"}}}'
   accessor(CLUSTERS_URL.format(options.cluster) + ADD_SERVICE_URL.format(SOLR_SERVICE_NAME), 'PUT', start_solr_body)
 
-def stop_solr_service(options, accessor):
-  # TODO check params
+def stop_solr_service(options, accessor, parser):
+  '''
+  Stop Solr service
+  '''
+  check_cluster_option(options, parser)
+
   stop_solr_body = '{"RequestInfo": {"context" :"Stop IOP Solr"}, "Body": {"ServiceInfo": {"state": "INSTALLED"}}}'
   accessor(CLUSTERS_URL.format(options.cluster) + ADD_SERVICE_URL.format(SOLR_SERVICE_NAME), 'PUT', stop_solr_body)
 
-def install_solr_service(options, accessor):
-  # TODO check params
+def install_solr_service(options, accessor, parser):
+  '''
+    Install Solr service
+    '''
+  check_cluster_option(options, parser)
+
   install_solr_body = '{"RequestInfo": {"context" :"Install IOP Solr"}, "Body": {"ServiceInfo": {"state": "INSTALLED"}}}'
   accessor(CLUSTERS_URL.format(options.cluster) + ADD_SERVICE_URL.format(SOLR_SERVICE_NAME), 'PUT', install_solr_body)
 
-def remove_solr_service(options, accessor):
-  # TODO check params
+def remove_solr_service(options, accessor, parser):
+  '''
+    Remove Solr service
+    '''
+  check_cluster_option(options, parser)
+
   accessor(CLUSTERS_URL.format(options.cluster) + ADD_SERVICE_URL.format(SOLR_SERVICE_NAME), 'DELETE')
 
-def configure_solr_service(options, accessor):
-  # TODO check params
+def configure_solr_service(options, accessor, parser):
+  '''
+  Configure new Solr host components used by a backup location:
+  1. Create the new Solr service
+  2. Create the new Solr component
+  3. Get old properties from backup configs
+  4. Merge the last one with the new properties (apply secrets and old solr-site configs if there is any)
+  5. Create host components based on the backed up hosts
+  '''
+  if not options.ranger_solr_secrets:
+    parser.print_help()
+    print('ranger-solr-secrets option is required')
+    sys.exit(1)
+  if not options.backup_location:
+    parser.print_help()
+    print('backup-location option is required')
+    sys.exit(1)
 
   ranger_solr_secrets = read_json(options.ranger_solr_secrets)
   backup_configs = read_json(options.backup_location + CONFIG_BACKUP_FILE)
@@ -240,7 +284,7 @@ def configure_solr_service(options, accessor):
   final_properties = apply_solr_site_configs(merged_properties_with_secrets, old_properties)
   print 'Processing new properties finished.'
 
-  configs = create_configs(options, accessor, final_properties, 'version12345')
+  configs = create_configs(options, accessor, final_properties, options.tag)
   apply_configs(options, accessor, configs)
 
   old_solr_hosts = get_component_hosts(backup_hosts)
@@ -257,23 +301,26 @@ if __name__=="__main__":
   parser.add_option("-p", "--password", dest="password", default="admin", type="string", help="password for accessing ambari server")
   parser.add_option("-l", "--backup-location", dest="backup_location", default="/tmp", type="string", help="input/output location of the backups")
   parser.add_option("-r", "--ranger-solr-secrets", dest="ranger_solr_secrets", default="secret_defaults.json", type="string", help="json file which contains secrets for ranger")
+  parser.add_option("-t", "--tag", dest="tag", default="version12345", type="string", help="config tag for the new configurations")
   (options, args) = parser.parse_args()
 
   protocol = 'https' if options.ssl else 'http'
+
   accessor = api_accessor(options.host, options.username, options.password, protocol, options.port)
 
   print 'Inputs: ' + str(options)
   if options.action == 'backup':
-    backup(options, accessor)
+    backup(options, accessor, parser)
   elif options.action == 'configure':
-    configure_solr_service(options, accessor)
+    configure_solr_service(options, accessor, parser)
   elif options.action == 'install':
-    install_solr_service(options, accessor)
+    install_solr_service(options, accessor, parser)
   elif options.action == 'start':
-    start_solr_service(options, accessor)
+    start_solr_service(options, accessor, parser)
   elif options.action == 'stop':
-    stop_solr_service(options, accessor)
+    stop_solr_service(options, accessor, parser)
   elif options.action == 'remove':
-    remove_solr_service(options, accessor)
+    remove_solr_service(options, accessor, parser)
   else:
     parser.print_help()
+    print 'action option is wrong or missing'
