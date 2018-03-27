@@ -44,12 +44,12 @@ def get_port_from_url(address):
 config = Script.get_config()
 tmp_dir = Script.get_tmp_dir()
 stack_root = Script.get_stack_root()
-stack_name = default("/hostLevelParams/stack_name", None)
+stack_name = default("/clusterLevelParams/stack_name", None)
 retryAble = default("/commandParams/command_retry_enabled", False)
 version = default("/commandParams/version", None)
 cluster_name = config["clusterName"]
 
-current_version = default("/hostLevelParams/current_version", None)
+current_version = default("/ambariLevelParams/current_version", None)
 upgrade_direction = default("/commandParams/upgrade_direction", None)
 stack_version = default("/commandParams/version", None)
 sudo = AMBARI_SUDO_BINARY
@@ -65,7 +65,7 @@ user_group = config['configurations']['cluster-env']['user_group']
 fetch_nonlocal_groups = config['configurations']['cluster-env']["fetch_nonlocal_groups"]
 
 # shared configs
-java64_home = config['hostLevelParams']['java_home']
+java64_home = config['ambariLevelParams']['java_home']
 zookeeper_hosts_list = config['clusterHostInfo']['zookeeper_hosts']
 zookeeper_hosts_list.sort()
 # get comma separated list of zookeeper hosts from clusterHostInfo
@@ -194,11 +194,11 @@ if has_ranger_admin and is_supported_solr_ranger:
   ranger_plugin_properties = config['configurations']['ranger-solr-plugin-properties']
 
   ranger_solr_audit = config['configurations']['ranger-solr-audit']
-  ranger_solr_audit_attrs = config['configuration_attributes']['ranger-solr-audit']
+  ranger_solr_audit_attrs = config['configurationAttributes']['ranger-solr-audit']
   ranger_solr_security = config['configurations']['ranger-solr-security']
-  ranger_solr_security_attrs = config['configuration_attributes']['ranger-solr-security']
+  ranger_solr_security_attrs = config['configurationAttributes']['ranger-solr-security']
   ranger_solr_policymgr_ssl = config['configurations']['ranger-solr-policymgr-ssl']
-  ranger_solr_policymgr_ssl_attrs = config['configuration_attributes']['ranger-solr-policymgr-ssl']
+  ranger_solr_policymgr_ssl_attrs = config['configurationAttributes']['ranger-solr-policymgr-ssl']
 
   policy_user = config['configurations']['ranger-solr-plugin-properties']['policy_user']
 
@@ -225,19 +225,19 @@ if has_ranger_admin and is_supported_solr_ranger:
     ranger_plugin_config['ambari.service.check.user'] = policy_user
 
   #For curl command in ranger plugin to get db connector
-  jdk_location = config['hostLevelParams']['jdk_location']
+  jdk_location = config['ambariLevelParams']['jdk_location']
   java_share_dir = '/usr/share/java'
   previous_jdbc_jar_name = None
 
   if stack_supports_ranger_audit_db:
     if xa_audit_db_flavor and xa_audit_db_flavor == 'mysql':
-      jdbc_jar_name = default("/hostLevelParams/custom_mysql_jdbc_name", None)
-      previous_jdbc_jar_name = default("/hostLevelParams/previous_custom_mysql_jdbc_name", None)
+      jdbc_jar_name = default("/ambariLevelParams/custom_mysql_jdbc_name", None)
+      previous_jdbc_jar_name = default("/ambariLevelParams/previous_custom_mysql_jdbc_name", None)
       audit_jdbc_url = format('jdbc:mysql://{xa_db_host}/{xa_audit_db_name}')
       jdbc_driver = "com.mysql.jdbc.Driver"
     elif xa_audit_db_flavor and xa_audit_db_flavor == 'oracle':
-      jdbc_jar_name = default("/hostLevelParams/custom_oracle_jdbc_name", None)
-      previous_jdbc_jar_name = default("/hostLevelParams/previous_custom_oracle_jdbc_name", None)
+      jdbc_jar_name = default("/ambariLevelParams/custom_oracle_jdbc_name", None)
+      previous_jdbc_jar_name = default("/ambariLevelParams/previous_custom_oracle_jdbc_name", None)
       colon_count = xa_db_host.count(':')
       if colon_count == 2 or colon_count == 0:
         audit_jdbc_url = format('jdbc:oracle:thin:@{xa_db_host}')
@@ -245,18 +245,18 @@ if has_ranger_admin and is_supported_solr_ranger:
         audit_jdbc_url = format('jdbc:oracle:thin:@//{xa_db_host}')
       jdbc_driver = "oracle.jdbc.OracleDriver"
     elif xa_audit_db_flavor and xa_audit_db_flavor == 'postgres':
-      jdbc_jar_name = default("/hostLevelParams/custom_postgres_jdbc_name", None)
-      previous_jdbc_jar_name = default("/hostLevelParams/previous_custom_postgres_jdbc_name", None)
+      jdbc_jar_name = default("/ambariLevelParams/custom_postgres_jdbc_name", None)
+      previous_jdbc_jar_name = default("/ambariLevelParams/previous_custom_postgres_jdbc_name", None)
       audit_jdbc_url = format('jdbc:postgresql://{xa_db_host}/{xa_audit_db_name}')
       jdbc_driver = "org.postgresql.Driver"
     elif xa_audit_db_flavor and xa_audit_db_flavor == 'mssql':
-      jdbc_jar_name = default("/hostLevelParams/custom_mssql_jdbc_name", None)
-      previous_jdbc_jar_name = default("/hostLevelParams/previous_custom_mssql_jdbc_name", None)
+      jdbc_jar_name = default("/ambariLevelParams/custom_mssql_jdbc_name", None)
+      previous_jdbc_jar_name = default("/ambariLevelParams/previous_custom_mssql_jdbc_name", None)
       audit_jdbc_url = format('jdbc:sqlserver://{xa_db_host};databaseName={xa_audit_db_name}')
       jdbc_driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
     elif xa_audit_db_flavor and xa_audit_db_flavor == 'sqla':
-      jdbc_jar_name = default("/hostLevelParams/custom_sqlanywhere_jdbc_name", None)
-      previous_jdbc_jar_name = default("/hostLevelParams/previous_custom_sqlanywhere_jdbc_name", None)
+      jdbc_jar_name = default("/ambariLevelParams/custom_sqlanywhere_jdbc_name", None)
+      previous_jdbc_jar_name = default("/ambariLevelParams/previous_custom_sqlanywhere_jdbc_name", None)
       audit_jdbc_url = format('jdbc:sqlanywhere:database={xa_audit_db_name};host={xa_db_host}')
       jdbc_driver = "sap.jdbc4.sqlanywhere.IDriver"
 
