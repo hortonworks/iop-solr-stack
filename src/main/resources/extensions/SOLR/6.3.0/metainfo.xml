@@ -19,5 +19,9 @@
       <name>HDP</name>
       <version>2.6</version>
     </stack>
+    <stack>
+      <name>HDP</name>
+      <version>3.0</version>
+    </stack>
   </stacks>
 </metainfo>
