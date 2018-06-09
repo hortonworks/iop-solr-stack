@@ -66,7 +66,7 @@ fetch_nonlocal_groups = config['configurations']['cluster-env']["fetch_nonlocal_
 
 # shared configs
 java64_home = config['ambariLevelParams']['java_home']
-zookeeper_hosts_list = config['clusterHostInfo']['zookeeper_hosts']
+zookeeper_hosts_list = config['clusterHostInfo']['zookeeper_server_hosts']
 zookeeper_hosts_list.sort()
 # get comma separated list of zookeeper hosts from clusterHostInfo
 zookeeper_hosts = ",".join(zookeeper_hosts_list)
