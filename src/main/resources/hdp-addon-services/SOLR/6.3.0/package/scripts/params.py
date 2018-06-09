@@ -282,7 +282,7 @@ if has_ranger_admin and is_supported_solr_ranger:
   if xa_audit_db_flavor == 'sqla':
     xa_audit_db_is_enabled = False
 
-  namenode_hosts = default("/clusterHostInfo/namenode_host", [])
+  namenode_hosts = default("/clusterHostInfo/namenode_hosts", [])
   has_namenode = not len(namenode_hosts) == 0
 
 
@@ -316,11 +316,13 @@ if 'ranger-env' in config['configurations']:
 
 
 import functools
+from resource_management.libraries.functions.get_not_managed_resources import get_not_managed_resources
 #create partial functions with common arguments for every HdfsDirectory call
 #to create hdfs directory we need to call params.HdfsDirectory in code
 HdfsResource = functools.partial(
   HdfsResource,
   user=hdfs_user,
+  hdfs_resource_ignore_file = "/var/lib/ambari-agent/data/.hdfs_resource_ignore",
   security_enabled = security_enabled,
   keytab = hdfs_user_keytab,
   kinit_path_local = kinit_path_local,
@@ -329,5 +331,6 @@ HdfsResource = functools.partial(
   principal_name = hdfs_principal_name,
   hdfs_site = hdfs_site,
   default_fs = default_fs,
-  dfs_type = dfs_type
+  immutable_paths = get_not_managed_resources(),
+  dfs_type = dfs_type,
 )
