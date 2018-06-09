@@ -11,6 +11,7 @@
           "name" : "iop_solr_spnego",
           "reference": "/spnego",
           "principal": {
+            "value": "HTTP/_HOST@${realm}",
             "configuration": "solr-env/solr_web_kerberos_principal"
           },
           "keytab": {
