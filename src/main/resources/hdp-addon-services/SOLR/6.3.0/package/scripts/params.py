@@ -332,5 +332,5 @@ HdfsResource = functools.partial(
   hdfs_site = hdfs_site,
   default_fs = default_fs,
   immutable_paths = get_not_managed_resources(),
-  dfs_type = dfs_type,
+  dfs_type = dfs_type
 )
