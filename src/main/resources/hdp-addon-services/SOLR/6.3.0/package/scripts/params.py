@@ -111,16 +111,16 @@ zookeeper_port = default('/configurations/zoo.cfg/clientPort', None)
 # get comma separated list of zookeeper hosts from clusterHostInfo
 index = 0
 zookeeper_quorum = ""
-for host in config['clusterHostInfo']['zookeeper_hosts']:
+for host in config['clusterHostInfo']['zookeeper_server_hosts']:
   zookeeper_quorum += host + ":" + str(zookeeper_port)
   index += 1
-  if index < len(config['clusterHostInfo']['zookeeper_hosts']):
+  if index < len(config['clusterHostInfo']['zookeeper_server_hosts']):
     zookeeper_quorum += ","
 
 solr_jaas_file = None
 
 if security_enabled:
-  _hostname_lowercase = config['hostname'].lower()
+  _hostname_lowercase = config['agentLevelParams']['hostname'].lower()
   solr_jaas_file = solr_conf + '/solr_jaas.conf'
   solr_kerberos_keytab = default('/configurations/solr-env/solr_kerberos_keytab', None)
   if not solr_kerberos_keytab: #Maybe against older configurations during a downgrade operation. Look for the old property
@@ -296,6 +296,7 @@ hadoop_bin_dir = stack_select.get_hadoop_dir("bin")
 hdfs_user = config['configurations']['hadoop-env']['hdfs_user']
 hdfs_site = config['configurations']['hdfs-site']
 default_fs = config['configurations']['core-site']['fs.defaultFS']
+dfs_type = default("/clusterLevelParams/dfs_type", "")
 hdfs_user_keytab = config['configurations']['hadoop-env']['hdfs_user_keytab']
 hdfs_principal_name = config['configurations']['hadoop-env']['hdfs_principal_name']
 kinit_path_local = status_params.kinit_path_local
@@ -327,5 +328,6 @@ HdfsResource = functools.partial(
   hadoop_conf_dir = hadoop_conf_dir,
   principal_name = hdfs_principal_name,
   hdfs_site = hdfs_site,
-  default_fs = default_fs
+  default_fs = default_fs,
+  dfs_type = dfs_type
 )
