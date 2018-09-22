@@ -1,5 +1,14 @@
 # IOP Solr service for Ambari
 
+## IOP Solr - Ambari MPack Matrix
+
+MPack version | Solr version | Ambari version
+--- | --- | --- 
+1.0.0.0 | 6.3.0 | 2.5.x - 2.6.x 
+1.0.0.1 | 6.6.5 | 2.5.x - 2.6.x 
+1.0.1.0 | 6.3.0 | 2.7.x 
+1.0.1.1 | 6.6.5 | 2.7.x 
+
 ## Generate IOP Solr mpack from source code
 Download iop-solr-stack repository from git then run:
 ```bash
