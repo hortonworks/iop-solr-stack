@@ -3,11 +3,11 @@
 ## IOP Solr - Ambari MPack Matrix
 
 MPack version | Solr version | Ambari version
---- | --- | --- 
-1.0.0.0 | 6.3.0 | 2.5.x - 2.6.x 
-1.0.0.1 | 6.6.5 | 2.5.x - 2.6.x 
-1.0.1.0 | 6.3.0 | 2.7.x 
-1.0.1.1 | 6.6.5 | 2.7.x 
+--- | --- | ---
+1.0.0.0 | 6.3.0 | 2.5.x - 2.6.x
+1.0.0.1 | 6.6.5 | 2.5.x - 2.6.x
+1.0.1.0 | 6.6.5 | 2.7.x
+1.0.1.1 | 6.6.5 | 2.7.x
 
 ## Generate IOP Solr mpack from source code
 Download iop-solr-stack repository from git then run:
@@ -69,11 +69,11 @@ Upgrade mpack:
 ```bash
 # centos7
 ambari-server upgrade-mpack \
---mpack=http://s3.amazonaws.com/dev.hortonworks.com/IOPSOLR/centos7/1.x/BUILDS/1.0.1.0-5/tars/iopsolr/iop-solr-mpack-6.3.0.1.0.1.0-5.tar.gz
+--mpack=http://s3.amazonaws.com/dev.hortonworks.com/IOPSOLR/centos7/1.x/BUILDS/1.0.1.0-7/tars/iopsolr/iop-solr-mpack-6.6.5.1.0.1.0-7.tar.gz
 
 # centos 6
 ambari-server upgrade-mpack \
---mpack=http://s3.amazonaws.com/dev.hortonworks.com/IOPSOLR/centos6/1.x/BUILDS/1.0.1.0-5/tars/iopsolr/iop-solr-mpack-6.3.0.1.0.1.0-5.tar.gz
+--mpack=http://s3.amazonaws.com/dev.hortonworks.com/IOPSOLR/centos6/1.x/BUILDS/1.0.1.0-7/tars/iopsolr/iop-solr-mpack-6.6.5.1.0.1.0-7.tar.gz
 ```
 
 Start ambari-server
@@ -84,9 +84,9 @@ ambari-server start
 Run the following on Solr server hosts:
 ```bash
 # centos 7
-wget -O /etc/yum.repos.d/iopsolr.repo http://s3.amazonaws.com/dev.hortonworks.com/IOPSOLR/centos7/1.x/BUILDS/1.0.1.0-5/iopsolr_public.repo # if the old repo name was iopsolr.repo
+wget -O /etc/yum.repos.d/iopsolr.repo http://s3.amazonaws.com/dev.hortonworks.com/IOPSOLR/centos7/1.x/BUILDS/1.0.1.0-7/iopsolr_public.repo # if the old repo name was iopsolr.repo
 # centos 6
-wget -O /etc/yum.repos.d/iopsolr.repo http://s3.amazonaws.com/dev.hortonworks.com/IOPSOLR/centos6/1.x/BUILDS/1.0.1.0-5/iopsolr_public.repo # if the old repo name was iopsolr.repo
+wget -O /etc/yum.repos.d/iopsolr.repo http://s3.amazonaws.com/dev.hortonworks.com/IOPSOLR/centos6/1.x/BUILDS/1.0.1.0-7/iopsolr_public.repo # if the old repo name was iopsolr.repo
 yum clean all
 yum upgrade iop-solr
 ```
