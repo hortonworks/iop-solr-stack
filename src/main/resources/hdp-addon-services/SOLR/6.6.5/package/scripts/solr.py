@@ -95,17 +95,17 @@ class Solr(Script):
       solr_cli.upload_configs(params.ranger_solr_config_set, params.ranger_solr_conf)
 
       solr_rest.create_collection(collection_name=params.ranger_solr_collection_name, config_name=params.ranger_solr_config_set,
-                                  shards=params.ranger_solr_shards, replicas=int(params.replication_factor), required_nodes=2)
+                                  shards=params.ranger_solr_shards, replicas=int(params.replication_factor), required_nodes=params.solr_wait_for_live_nodes)
 
     if params.has_atlas and params.atlas_solr_bootstrap:
       solr_cli.upload_configs(params.atlas_solr_configs, params.atlas_configs_dir)
 
       solr_rest.create_collection(collection_name=params.atlas_vertex_index_name, config_name=params.atlas_solr_configs,
-                                  shards=params.atlas_solr_shards, replicas=int(params.atlas_solr_replication_factor), required_nodes=2)
+                                  shards=params.atlas_solr_shards, replicas=int(params.atlas_solr_replication_factor), required_nodes=params.solr_wait_for_live_nodes)
       solr_rest.create_collection(collection_name=params.atlas_edge_index_name, config_name=params.atlas_solr_configs,
-                                  shards=params.atlas_solr_shards, replicas=int(params.atlas_solr_replication_factor), required_nodes=2)
+                                  shards=params.atlas_solr_shards, replicas=int(params.atlas_solr_replication_factor), required_nodes=params.solr_wait_for_live_nodes)
       solr_rest.create_collection(collection_name=params.atlas_fulltext_index_name, config_name=params.atlas_solr_configs,
-                                  shards=params.atlas_solr_shards, replicas=int(params.atlas_solr_replication_factor), required_nodes=2)
+                                  shards=params.atlas_solr_shards, replicas=int(params.atlas_solr_replication_factor), required_nodes=params.solr_wait_for_live_nodes)
 
   def stop(self, env, upgrade_type=None):
     import params
