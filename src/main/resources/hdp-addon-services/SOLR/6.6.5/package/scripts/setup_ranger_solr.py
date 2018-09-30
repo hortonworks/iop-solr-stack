@@ -18,10 +18,8 @@ import os
 
 from resource_management.core.logger import Logger
 from resource_management.core.resources import File, Execute
-from resource_management.core.source import StaticFile
 from resource_management.libraries.functions.format import format
 from resource_management.core.resources.system import Directory
-
 
 def setup_ranger_solr():
   import params
@@ -109,17 +107,16 @@ def setup_ranger_solr():
               only_if=format('ls /etc/iop-solr/conf/{properties_file}'),
               sudo=True)
 
-    zk_port = ":" + params.zookeeper_port + ","
-
     if params.enable_ranger_solr:
-      zookeeper_hosts_ip = zk_port.join(params.zookeeper_hosts_list) + ":" + params.zookeeper_port
-      zookeeper_script = format("{solr_dir}/server/scripts/cloud-scripts/zkcli.sh")
-
-      set_solr_ranger_authorizer = format('JAVA_HOME={java64_home} {zookeeper_script} -zkhost {zookeeper_hosts_ip} ' +
-                      '-cmd put {solr_znode}/security.json \'{{\"authentication":{{\"class\":\"org.apache.solr.security.KerberosPlugin\"}},\"authorization\":{{\"class\": '+
-                      '\"org.apache.ranger.authorization.solr.authorizer.RangerSolrAuthorizer\"}}}}\'')
-
+      set_solr_ranger_authorizer = params.zkcli_prefix + format('put {solr_znode}/security.json \'{{\"authentication":{{\"class\":\"org.apache.solr.security.KerberosPlugin\"}},\"authorization\":{{\"class\": ' +
+                                                                '\"org.apache.ranger.authorization.solr.authorizer.RangerSolrAuthorizer\"}}}}\'')
       Execute(set_solr_ranger_authorizer)
 
+  elif params.security_enabled:
+    Logger.info('Ranger Solr plugin is not enabled.')
+    setup_kerberos_security_json = params.zkcli_prefix + format('put {solr_znode}/security.json \'{{\"authentication":{{\"class\":\"org.apache.solr.security.KerberosPlugin\"}}}\'')
+    Execute(setup_kerberos_security_json)
   else:
-    Logger.info('Ranger admin not installed')
+    Logger.info('Security is disabled.')
+    setup_kerberos_security_json = params.zkcli_prefix + format('put {solr_znode}/security.json \'{}\'')
+    Execute(setup_kerberos_security_json)

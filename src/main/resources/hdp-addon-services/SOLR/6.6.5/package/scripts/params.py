@@ -82,6 +82,10 @@ solr_client_dir = '/usr/hdp/current/solr-client'
 solr_bindir = solr_dir + '/bin'
 cloud_scripts = solr_dir + '/server/scripts/cloud-scripts'
 
+limits_conf_dir = "/etc/security/limits.d"
+solr_user_nofile_limit = default("/configurations/solr-env/infra_solr_user_nofile_limit", "128000")
+solr_user_nproc_limit = default("/configurations/solr-env/infra_solr_user_nproc_limit", "65536")
+
 if "solr-env" in config['configurations']:
   solr_hosts = config['clusterHostInfo']['solr_hosts']
   solr_znode = default('/configurations/solr-env/solr_znode', '/solr')
@@ -118,9 +122,9 @@ for host in config['clusterHostInfo']['zookeeper_server_hosts']:
     zookeeper_quorum += ","
 
 solr_jaas_file = None
+hostname_lowercase = config['agentLevelParams']['hostname'].lower()
 
 if security_enabled:
-  _hostname_lowercase = config['agentLevelParams']['hostname'].lower()
   solr_jaas_file = solr_conf + '/solr_jaas.conf'
   solr_kerberos_keytab = default('/configurations/solr-env/solr_kerberos_keytab', None)
   if not solr_kerberos_keytab: #Maybe against older configurations during a downgrade operation. Look for the old property
@@ -129,18 +133,18 @@ if security_enabled:
 
   solr_kerberos_principal = default('/configurations/solr-env/solr_kerberos_principal', None)
   if solr_kerberos_principal:
-    solr_kerberos_principal = solr_kerberos_principal.replace('_HOST',_hostname_lowercase)
+    solr_kerberos_principal = solr_kerberos_principal.replace('_HOST', hostname_lowercase)
   else: #Maybe against older configurations during a downgrade operation. Look for the old property
     solr_site = dict(config['configurations']['solr-site'])
     solr_principal = solr_site['solr.hdfs.security.kerberos.principal']
-    solr_principal = solr_principal.replace('_HOST', _hostname_lowercase)
+    solr_principal = solr_principal.replace('_HOST', hostname_lowercase)
     solr_site['solr.hdfs.security.kerberos.principal']=solr_principal
     solr_kerberos_principal = solr_principal
 
   solr_web_kerberos_keytab = config['configurations']['solr-env']['solr_web_kerberos_keytab']
   solr_web_kerberos_principal = default('/configurations/solr-env/solr_web_kerberos_principal', None)
   if solr_web_kerberos_principal:
-    solr_web_kerberos_principal = solr_web_kerberos_principal.replace('_HOST',_hostname_lowercase)
+    solr_web_kerberos_principal = solr_web_kerberos_principal.replace('_HOST', hostname_lowercase)
   solr_kerberos_name_rules = config['configurations']['solr-env']['solr_kerberos_name_rules']
 
 solr_xml_content = default('configurations/solr-xml/content', None)
@@ -313,6 +317,47 @@ if 'ranger-env' in config['configurations']:
   is_solrCloud_enabled = default('/configurations/ranger-env/is_solrCloud_enabled', False)
   is_external_solrCloud_enabled = default('/configurations/ranger-env/is_external_solrCloud_enabled', False)
   stack_supports_ranger_kerberos = check_stack_feature(StackFeature.RANGER_KERBEROS_SUPPORT, version_for_stack_feature_checks)
+
+  ranger_audit_max_retention_days = int(default('/configurations/ranger-solr-configuration/ranger_audit_max_retention_days', "90"))
+  ranger_audit_logs_merge_factor = int(default('/configurations/ranger-solr-configuration/ranger_audit_logs_merge_factor', "5"))
+  ranger_solr_config_content = default('/configurations/ranger-solr-configuration/content', None)
+  ranger_solr_bootstrap = default("/configurations/solr-env/solr_ranger_bootstrap", True)
+
+atlas_server_hosts = default("/clusterHostInfo/atlas_server_hosts", [])
+has_atlas = not len(atlas_server_hosts) == 0
+if 'atlas-env' in config['configurations']:
+  atlas_solr_configs = "atlas_configs"
+  atlas_configs_dir = format("{solr_dir}/server/solr/configsets/{atlas_solr_configs}")
+  atlas_solr_replication_factor = int(default("/configurations/atlas-env/atlas_solr_replication_factor", 2))
+  atlas_solr_shards = default("/configurations/atlas-env/atlas_solr_shards", 2)
+  atlas_solrconfig_content = default("/configurations/atlas-solrconfig/content", None)
+  atlas_solr_bootstrap = default("/configurations/solr-env/solr_atlas_bootstrap", False)
+  atlas_edge_index_name = "edge_index"
+  atlas_vertex_index_name = "vertex_index"
+  atlas_fulltext_index_name = "fulltext_index"
+
+solr_wait_for_live_nodes = int(default("/configurations/solr-env/solr_wait_for_live_nodes", 0))
+solr_delete_write_locks = default("/configurations/solr-env/solr_delete_write_locks", True)
+
+zkcli_extra = format("source {solr_conf}/solr-env.sh; ")
+if security_enabled:
+  solr_kinit_cmd = format("{kinit_path_local} -kt {solr_kerberos_keytab} {solr_kerberos_principal}; ")
+  solr_zk_creds_and_acls = "export SOLR_ZK_CREDS_AND_ACLS=${SOLR_AUTHENTICATION_OPTS}; "
+
+  zookeeper_principal_name = default("/configurations/zookeeper-env/zookeeper_principal_name", "zookeeper/_HOST@EXAMPLE.COM")
+  #external_zk_principal_enabled = default("/configurations/solr-env/infra_solr_zookeeper_external_enabled", False)
+  #external_zk_principal_name = default("/configurations/solr-env/infra_solr_zookeeper_external_principal", "zookeeper/_HOST@EXAMPLE.COM")
+
+  zk_principal_name = zookeeper_principal_name # TODO: set this differently if external zookeeper is enabled
+  zk_principal_user = zk_principal_name.split('/')[0]
+  zkcli_jvm_flags = format('ZKCLI_JVM_FLAGS="-Dzookeeper.sasl.client=true -Dzookeeper.sasl.client.username={zk_principal_user} -Dzookeeper.sasl.clientconfig=Client"')
+
+  zkcli_extra+=solr_kinit_cmd
+  zkcli_extra+=solr_zk_creds_and_acls
+  zkcli_extra+=zkcli_jvm_flags
+
+zkcli_root_prefix = format("{zkcli_extra} JAVA_HOME={java64_home} {solr_dir}/server/scripts/cloud-scripts/zkcli.sh -zkhost {zookeeper_quorum} -cmd ")
+zkcli_prefix = format("{zkcli_extra} JAVA_HOME={java64_home} {solr_dir}/server/scripts/cloud-scripts/zkcli.sh -zkhost {zookeeper_quorum}{solr_znode} -cmd ")
 
 
 import functools

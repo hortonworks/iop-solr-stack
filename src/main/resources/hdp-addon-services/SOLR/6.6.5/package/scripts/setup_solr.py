@@ -16,14 +16,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 """
+import os
+import solr_cli
 
 from resource_management.core.exceptions import Fail
 from resource_management.core.source import InlineTemplate, Template, StaticFile
-from resource_management.core.resources.system import Directory, File
-from resource_management.libraries.functions.decorator import retry
+from resource_management.core.resources.system import Directory, Execute, File
 from resource_management.libraries.functions.format import format
-from resource_management.libraries.functions import solr_cloud_util
-from resource_management.libraries.functions.default import default
 
 def setup_solr(name = None):
   import params
@@ -90,40 +89,35 @@ def setup_solr(name = None):
          group=params.user_group
          )
 
-    jaas_file = params.solr_jaas_file if params.security_enabled else None
-    url_scheme = 'https' if params.solr_ssl_enabled else 'http'
-
-    create_solr_znode()
-
     if params.security_enabled:
       File(format("{solr_jaas_file}"),
            content=Template("solr_jaas.conf.j2"),
            owner=params.solr_user)
 
-    solr_cloud_util.set_cluster_prop(
-      zookeeper_quorum=params.zookeeper_quorum,
-      solr_znode=params.solr_znode,
-      java64_home=params.java64_home,
-      prop_name="urlScheme",
-      prop_value=url_scheme,
-      jaas_file=jaas_file
-    )
+    if os.path.exists(params.limits_conf_dir):
+      File(os.path.join(params.limits_conf_dir, 'solr.conf'),
+           owner='root',
+           group='root',
+           mode=0644,
+           content=Template("solr.conf.j2")
+           )
 
-    solr_cloud_util.setup_kerberos_plugin(
-      zookeeper_quorum=params.zookeeper_quorum,
-      solr_znode=params.solr_znode,
-      jaas_file=jaas_file,
-      java64_home=params.java64_home,
-      secure=params.security_enabled
-    )
+    if params.has_ranger_admin and params.atlas_solrconfig_content:
+      File(format("{ranger_solr_conf}/solrconfig.xml"),
+           content=InlineTemplate(params.ranger_solr_config_content),
+           owner=params.solr_user,
+           group=params.user_group,
+           mode=0644
+           )
+    if params.has_atlas and params.atlas_solrconfig_content:
+      File(format("{atlas_configs_dir}/solrconfig.xml"),
+           content=InlineTemplate(params.atlas_solrconfig_content),
+           owner=params.solr_user,
+           group=params.user_group,
+           mode=0644
+           )
+
+    solr_cli.create_znode()
 
   else :
     raise Fail('Neither client, nor server were selected to install.')
-
-@retry(times=30, sleep_time=5, err_class=Fail)
-def create_solr_znode():
-  import params
-  solr_cloud_util.create_znode(
-    zookeeper_quorum=params.zookeeper_quorum,
-    solr_znode=params.solr_znode,
-    java64_home=params.java64_home)

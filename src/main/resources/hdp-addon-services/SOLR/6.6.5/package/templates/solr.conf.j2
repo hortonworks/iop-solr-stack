@@ -12,13 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-version=1.0.0
-stackVersion=1.0.1.0
-stackBuildNumber=24
-stackFolder=/usr/iopsolr
-packageName=iop-solr
-repoid=IOPSOLR
-repoCentos6BaseUrl=http://s3.amazonaws.com/dev.hortonworks.com/${repoid}/centos6/1.x/BUILDS/${stackVersion}-${stackBuildNumber}/
-repoCentos7BaseUrl=http://s3.amazonaws.com/dev.hortonworks.com/${repoid}/centos7/1.x/BUILDS/${stackVersion}-${stackBuildNumber}/
-solrVersion=6.6.5
-solrTar=http://s3.amazonaws.com/public-repo-1.hortonworks.com/ARTIFACTS/dist/lucene/solr/${solrVersion}/solr-${solrVersion}.tgz
+
+{{solr_user}}   - nofile {{solr_user_nofile_limit}}
+{{solr_user}}   - nproc  {{solr_user_nproc_limit}}
