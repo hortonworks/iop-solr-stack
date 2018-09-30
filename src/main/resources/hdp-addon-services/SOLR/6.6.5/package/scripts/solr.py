@@ -19,6 +19,9 @@ limitations under the License.
 
 import os
 import sys
+import solr_cli
+import solr_rest
+import write_lock_handler
 
 from resource_management.core.resources.system import Execute, File
 from resource_management.core.logger import Logger
@@ -33,8 +36,6 @@ from resource_management.libraries.functions.version import compare_versions
 from resource_management.libraries.functions.version import format_stack_version
 from setup_solr import setup_solr
 from setup_ranger_solr import setup_ranger_solr
-from resource_management.libraries.functions import solr_cloud_util
-
 
 class Solr(Script):
   def install(self, env):
@@ -60,10 +61,10 @@ class Solr(Script):
     import params
     env.set_params(params)
     self.configure(env)
+    write_lock_handler.remove_write_locks()
 
     if params.security_enabled:
-      solr_kinit_cmd = format("{kinit_path_local} -kt {solr_kerberos_keytab} {solr_kerberos_principal}; ")
-      Execute(solr_kinit_cmd, user=params.solr_user)
+      Execute(params.solr_kinit_cmd, user=params.solr_user)
 
     if params.is_supported_solr_ranger:
        setup_ranger_solr() #Ranger Solr Plugin related call
@@ -72,32 +73,40 @@ class Solr(Script):
       solr_env = {'SOLR_INCLUDE': format('{solr_conf}/solr.in.sh')}
     else:
       solr_env = {'SOLR_INCLUDE': format('{solr_conf}/solr-env.sh')}
+
+    if params.solr_ssl_enabled: # add through env variables - can be removed from solr-env.sh if it's required
+      solr_env['SOLR_SSL_KEY_STORE_PASSWORD'] = format("{solr_keystore_password!p}")
+      solr_env['SOLR_SSL_TRUST_STORE_PASSWORD'] = format("{solr_truststore_password!p}")
+
+    start_cmd = format('{solr_bindir}/solr start -cloud -noprompt -s {solr_datadir} -Dsolr.kerberos.name.rules=\'{solr_kerberos_name_rules}\' 2>&1') \
+      if params.security_enabled else format('{solr_bindir}/solr start -cloud -noprompt -s {solr_datadir} 2>&1')
+    piped_start_cmd = format('{start_cmd} | tee {solr_log}') + '; (exit "${PIPESTATUS[0]}")'
+
+    check_process = format("{sudo} test -f {solr_pidfile} && {sudo} pgrep -F {solr_pidfile}")
+
     Execute(
-      format('{solr_bindir}/solr start -cloud -noprompt -s {solr_datadir} >> {solr_log} 2>&1'),
+      piped_start_cmd,
       environment=solr_env,
-      user=params.solr_user
+      user=params.solr_user,
+      not_if=check_process,
+      logoutput=True
     )
 
-    if 'ranger-env' in params.config['configurations'] and params.audit_solr_enabled:
-      solr_cloud_util.upload_configuration_to_zk(
-        zookeeper_quorum=params.zookeeper_quorum,
-        solr_znode=params.solr_znode,
-        config_set=params.ranger_solr_config_set,
-        config_set_dir=params.ranger_solr_conf,
-        tmp_dir=params.tmp_dir,
-        java64_home=params.java64_home,
-        jaas_file=params.solr_jaas_file,
-        retry=30, interval=5)
+    if 'ranger-env' in params.config['configurations'] and params.audit_solr_enabled and params.ranger_solr_bootstrap:
+      solr_cli.upload_configs(params.ranger_solr_config_set, params.ranger_solr_conf)
 
-      solr_cloud_util.create_collection(
-        zookeeper_quorum=params.zookeeper_quorum,
-        solr_znode=params.solr_znode,
-        collection=params.ranger_solr_collection_name,
-        config_set=params.ranger_solr_config_set,
-        java64_home=params.java64_home,
-        shards=params.ranger_solr_shards,
-        replication_factor=int(params.replication_factor),
-        jaas_file=params.solr_jaas_file)
+      solr_rest.create_collection(collection_name=params.ranger_solr_collection_name, config_name=params.ranger_solr_config_set,
+                                  shards=params.ranger_solr_shards, replicas=int(params.replication_factor), required_nodes=2)
+
+    if params.has_atlas and params.atlas_solr_bootstrap:
+      solr_cli.upload_configs(params.atlas_solr_configs, params.atlas_configs_dir)
+
+      solr_rest.create_collection(collection_name=params.atlas_vertex_index_name, config_name=params.atlas_solr_configs,
+                                  shards=params.atlas_solr_shards, replicas=int(params.atlas_solr_replication_factor), required_nodes=2)
+      solr_rest.create_collection(collection_name=params.atlas_edge_index_name, config_name=params.atlas_solr_configs,
+                                  shards=params.atlas_solr_shards, replicas=int(params.atlas_solr_replication_factor), required_nodes=2)
+      solr_rest.create_collection(collection_name=params.atlas_fulltext_index_name, config_name=params.atlas_solr_configs,
+                                  shards=params.atlas_solr_shards, replicas=int(params.atlas_solr_replication_factor), required_nodes=2)
 
 
   def stop(self, env, upgrade_type=None):
@@ -114,10 +123,14 @@ class Solr(Script):
           self.configure(env)
 
       no_op_test = format("! ((`SOLR_INCLUDE={env} {solr_bindir}/solr status | grep process | wc -l`))")
-      Execute(format('{solr_bindir}/solr stop -all >> {solr_log}'),
+
+      stop_cmd=format('{solr_bindir}/solr stop -all')
+      piped_stop_cmd=format('{stop_cmd} | tee {solr_log}') + '; (exit "${PIPESTATUS[0]}")'
+      Execute(piped_stop_cmd,
               environment={'SOLR_INCLUDE': env},
               user=params.solr_user,
-              not_if=no_op_test
+              not_if=no_op_test,
+              logoutput=True
               )
 
       File(params.solr_pidfile,

@@ -22,7 +22,7 @@
       <name>SOLR</name>
       <displayName>Solr</displayName>
       <comment>Solr is the popular, blazing fast open source enterprise search platform from the Apache Lucene project</comment>
-      <version>6.3.0</version>
+      <version>6.6.5</version>
       <components>
         <component>
           <name>SOLR</name>
@@ -74,9 +74,6 @@
               <name>iop-solr</name>
             </package>
             <package>
-              <name>ambari-infra-solr-client</name>
-            </package>
-            <package>
               <name>ranger-solr-plugin</name>
             </package>
           </packages>
@@ -86,9 +83,6 @@
           <packages>
             <package>
               <name>iop-solr</name>
-            </package>
-            <package>
-              <name>ambari-infra-solr-client</name>
             </package>
             <package>
               <name>ranger-solr-plugin</name>
