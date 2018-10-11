@@ -51,10 +51,10 @@ def check_hdfs_files_exist(write_locks_pattern):
 
 def remove_write_locks():
   """
-  Removes write lock files from base solr hdfs dir based on a pattern (<solr_hdfs_home>/*/*/data/index/write.lock)
+  Removes write lock files from base solr hdfs dir based on a pattern (<solr_hdfs_home>/*/core_node*/data/index/write.lock)
   """
   import params
-  write_locks_pattern = format("{solr_hdfs_home_dir}/*/*/data/index/write.lock")
+  write_locks_pattern = format("{solr_hdfs_home_dir}/*/core_node*/data/index/write.lock")
   if check_hdfs_files_exist(write_locks_pattern):
     delete_cmd=create_command(format("hdfs dfs -rm -f {write_locks_pattern}"))
     returncode, stdout = execute_commad(delete_cmd)
