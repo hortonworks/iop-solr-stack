@@ -56,7 +56,7 @@ def remove_write_locks():
   import params
   write_locks_pattern = format("{solr_hdfs_home_dir}/*/*/data/index/write.lock")
   if check_hdfs_files_exist(write_locks_pattern):
-    delete_cmd=create_command("hdfs dfs -rm -f {write_locks_pattern}")
+    delete_cmd=create_command(format("hdfs dfs -rm -f {write_locks_pattern}"))
     returncode, stdout = execute_commad(delete_cmd)
     if stdout:
       Logger.info(format("Output of hdfs command (skip errors): {stdout}"))
