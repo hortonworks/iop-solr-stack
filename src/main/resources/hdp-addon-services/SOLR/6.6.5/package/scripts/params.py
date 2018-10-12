@@ -107,6 +107,7 @@ if "solr-env" in config['configurations']:
   solr_log = format("{solr_log_dir}/solr-install.log")
   solr_env_content = config['configurations']['solr-env']['content']
   solr_hdfs_home_dir = config['configurations']['solr-env']['solr_hdfs_home_dir']
+  solr_hdfs_user_dir = format('/user/{solr_user}')
 
 if upgrade_direction is not None and upgrade_direction == Direction.UPGRADE:
   old_lib_dir=default("/configurations/solr-env/solr_lib_dir", None)
