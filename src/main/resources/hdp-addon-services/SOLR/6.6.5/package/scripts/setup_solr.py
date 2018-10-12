@@ -37,6 +37,14 @@ def setup_solr(name = None):
 
     params.HdfsResource(None, action="execute")
 
+    params.HdfsResource(params.solr_hdfs_user_dir,
+                        type="directory",
+                        action="create_on_execute",
+                        owner=params.solr_user,
+                        mode=0755
+                        )
+    params.HdfsResource(None, action="execute")
+
     Directory([params.solr_log_dir, params.solr_piddir,
                params.solr_datadir, params.solr_data_resources_dir],
               mode=0755,
@@ -102,7 +110,7 @@ def setup_solr(name = None):
            content=Template("solr.conf.j2")
            )
 
-    if params.has_ranger_admin and params.atlas_solrconfig_content:
+    if params.has_ranger_admin and params.ranger_solr_config_content:
       File(format("{ranger_solr_conf}/solrconfig.xml"),
            content=InlineTemplate(params.ranger_solr_config_content),
            owner=params.solr_user,
